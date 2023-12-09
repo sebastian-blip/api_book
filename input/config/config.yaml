@@ -1,0 +1,5 @@
+# Los ambientes de de despliegue son:
+# PROD: Producción
+# TEST: Pruebas
+# DEV: Desarrollo
+env: DEV
