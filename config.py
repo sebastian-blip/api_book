@@ -1,5 +1,6 @@
 import logging
 import yaml
+import motor.motor_asyncio
 
 from functools import lru_cache
 from pydantic import BaseSettings
@@ -47,6 +48,17 @@ def get_config_env():
     env = config_env[get_config().get('env')]
 
     return env
+
+
+@lru_cache()
+def get_bd():
+    """Obtiene la bd mongo"""
+    mongo_puerto = get_config().get('mongo_port')
+    mongo_host = get_config().get('host_mongo')
+    client = motor.motor_asyncio.AsyncIOMotorClient(mongo_host, mongo_puerto)
+    bd = client.books
+
+    return bd
 
 
 @lru_cache()

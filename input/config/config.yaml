@@ -3,3 +3,7 @@
 # TEST: Pruebas
 # DEV: Desarrollo
 env: DEV
+
+# Datos de mongo db
+mongo_port: 2027
+host_mongo: localhost
