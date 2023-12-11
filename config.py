@@ -2,6 +2,7 @@ import logging
 import yaml
 import motor.motor_asyncio
 
+from dotenv import load_dotenv
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 from metadata.path import Path
@@ -59,6 +60,11 @@ def get_bd():
     bd = client.api_books
 
     return bd
+
+
+@lru_cache()
+def get_env():
+    return load_dotenv(dotenv_path=Path.env)
 
 
 @lru_cache()

@@ -1,5 +1,7 @@
+import os
 import requests
 
+from config import get_env
 from metadata.google import GoogleBookApi
 
 
@@ -30,8 +32,11 @@ async def buscar_google_api(atributos: dict) -> dict | None:
             for clave, valor in atributos_search.items()
         ]
     )
+
     google_api_url = f'{GoogleBookApi.url}{string_atributos}'
-    google_api_url = f'{google_api_url}&{GoogleBookApi.key}'
+    get_env()
+    api_google_key = os.getenv('GOOGLE_API_KEY')
+    google_api_url = f'{google_api_url}&key={api_google_key}'
     response = requests.get(google_api_url)
 
     if response.status_code == 200 and 'items' in response.json():
@@ -42,6 +47,10 @@ async def buscar_google_api(atributos: dict) -> dict | None:
             GoogleBookApi.rename_atributos[clave]: info_book[clave]
             for clave in GoogleBookApi.atributos_book & info_book.keys()
         }
+
+        info_book['autor'] = ','.join(info_book['autor'])
+        info_book['categorias'] = ','.join(info_book['categorias'])
+        info_book['subtitulo'] = None
 
         return info_book
 
