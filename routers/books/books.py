@@ -12,7 +12,7 @@ books_router = APIRouter(prefix='/books', tags=['books_router'])
 
 
 @books_router.post(path="/get-book", status_code=200)
-async def get_book(atri_book: AttributesBooks) -> dict:
+async def get_book(atri_book: AttributesBooks) -> JSONResponse:
     """Endpoint que busca un libro en la bd interna o un API externa.
 
     Args:
@@ -50,7 +50,9 @@ async def get_book(atri_book: AttributesBooks) -> dict:
 
     description_book['fuente'] = fuente
 
-    return description_book
+    result = JSONResponse(status_code=200, content=description_book)
+
+    return result
 
 
 @books_router.post(path='/create-book')
@@ -94,3 +96,32 @@ async def create_book(id: str, fuente: str):
         log = get_log()
         log.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail='No se pudo crear el libro')
+
+
+@books_router.delete(path='/delete-book', status_code=200)
+async def delete_book(id: str) -> JSONResponse:
+    """
+
+    Args:
+        id:
+
+    Returns:
+
+    """
+
+    mongo_bd = get_bd()
+    book_collection = mongo_bd['books']
+
+    atri_to_delete = {'id': id}
+    description_book = await book_collection.delete_one(atri_to_delete)
+
+    if description_book.deleted_count > 0:
+        result = JSONResponse(
+            status_code=200, content='Libro borrado correctamente'
+        )
+    else:
+        result = JSONResponse(
+            status_code=402, content='Libro no encontrado en la bd'
+        )
+
+    return result
