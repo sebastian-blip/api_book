@@ -4,14 +4,10 @@ class GoogleBookApi:
     url = 'https://www.googleapis.com/books/v1/volumes?'
     """Url para hacer request al api"""
 
-    key = 'AIzaSyAsr2YErWGuFcMLKz1Bo3rc1OOBR3JN3b4'
-    """Api token de google"""
-
     google_atributos = {
         'titulo': 'intitle',
         'autor': 'inauthor',
         'catergorias': 'subject',
-        'id': 'isbn',
         'editor': 'inpublisher',
         'descripcion': 'q',
     }
@@ -24,6 +20,7 @@ class GoogleBookApi:
         'publisher',
         'publishedDate',
         'description',
+        'categories',
     ]
     """Atributos que se desean mostrar en el resultado"""
 
@@ -31,7 +28,8 @@ class GoogleBookApi:
         "id": "id",
         "title": "titulo",
         "authors": "autor",
-        "publisher": "edi   tor",
+        "categories": "categorias",
+        "publisher": "editor",
         "publishedDate": "fecha_publicacion",
         "description": "descripcion",
     }

@@ -10,3 +10,6 @@ class Path:
 
     config = os.path.join(input_, 'config', 'config.yaml')
     """Path donde se encuentran el archivo de config"""
+
+    env = os.path.join(input_, 'credenciales', '.env')
+    """Archivo que contiene las variables de entorno"""
