@@ -27,8 +27,8 @@ async def validar_usuario(usuario: str, password: str) -> bool:
         {'username': usuario}, projection=projection
     )
 
-    if not user_data.empty:
-        passw = user_data['pagit sssword']
+    if user_data:
+        passw = user_data['password']
         passw_db = hash_password(password)
 
         if secrets.compare_digest(passw_db, passw):
