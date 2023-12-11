@@ -1,11 +1,14 @@
+import httpx
+import traceback
+import asyncio
 from config import get_bd
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-import traceback
+
 
 from config import get_log
 from parser.parser_books import AttributesBooks
-from utils.buscar_book_api import buscar_google_api
+from utils.buscar_book_api import buscar_google_api, buscar_open_api
 
 
 books_router = APIRouter(prefix='/books', tags=['books_router'])
@@ -22,7 +25,6 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
         Resultado de la busqueda.
 
     """
-    fuente = 'bd interna'
     mongo_bd = get_bd()
     book_collection = mongo_bd['books']
 
@@ -42,13 +44,20 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
         )
 
         if not description_book:
-            description_book = await buscar_google_api(atri_to_search)
-            fuente = 'google'
+            async with httpx.AsyncClient() as client:
+                google_task = buscar_google_api(client, atri_to_search)
+                open_task = buscar_open_api(client, atri_to_search)
+                description_book = await asyncio.gather(google_task, open_task)
+                description_book = max(
+                    description_book,
+                    key=lambda x: len([v for v in x.values() if v is not None]),
+                )
+
+        else:
+            description_book['fuente'] = 'bd interna'
 
         if not description_book:
             raise HTTPException(status_code=404, detail="Libro no encontrado")
-
-    description_book['fuente'] = fuente
 
     result = JSONResponse(status_code=200, content=description_book)
 
