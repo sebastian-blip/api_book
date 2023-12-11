@@ -20,7 +20,7 @@ async def validar_usuario(usuario: str, password: str) -> bool:
     respuesta = False
 
     mongo_bd = get_bd()
-    book_collection = mongo_bd['books']
+    book_collection = mongo_bd['users']
 
     projection = {'_id': False}
     user_data = await book_collection.find_one(
