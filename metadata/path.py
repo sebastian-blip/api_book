@@ -13,3 +13,8 @@ class Path:
 
     env = os.path.join(input_, 'credenciales', '.env')
     """Archivo que contiene las variables de entorno"""
+
+    public_key_jwt = os.path.join(input_, 'credenciales', 'public_jwt.pem')
+    """path donde se encuentra llave publica jwt"""
+    private_key_jwt = os.path.join(input_, 'credenciales', 'private_jwt.pem')
+    """path donde se encuentra la llave privada jwt"""

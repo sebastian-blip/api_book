@@ -52,6 +52,34 @@ def get_config_env():
 
 
 @lru_cache()
+def get_llaves_jwt() -> dict:
+    """Obtiene las llaves pública y privada para codificar y
+    decodificar token jwt.
+
+    Returns:
+        Llaves pública y privada.
+
+      ... code-block:: python
+
+            {'private_jwt_key': 'vFivSFFFVbausuhgasdhjcxz',
+            'public_jwt_key': 'achcibcew76yewhjcdsweISkjsj'}
+    """
+
+    with open(Path.private_key_jwt) as fname:
+        private_jwt_pem = fname.read()
+
+    with open(Path.public_key_jwt) as fname:
+        public_jwt_pem = fname.read()
+
+    keys = {
+        'private_jwt_key': private_jwt_pem,
+        'public_jwt_key': public_jwt_pem,
+    }
+
+    return keys
+
+
+@lru_cache()
 def get_bd():
     """Obtiene la bd mongo"""
     mongo_puerto = get_config().get('mongo_port')
