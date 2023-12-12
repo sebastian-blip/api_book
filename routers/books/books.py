@@ -86,19 +86,19 @@ async def create_book(book_data: CrearBook) -> JSONResponse:
     mongo_bd = get_bd()
     book_collection = mongo_bd['books']
     projection = {'_id': False}
-    atri_to_search = {'id': create_book.id}
+    atri_to_search = {'id': book_data.id}
     description_book = await book_collection.find_one(
         atri_to_search, projection=projection
     )
 
     if description_book:
         raise HTTPException(
-            status_code=409, detail='El libro ya se existe en la base de datos'
+            status_code=409, detail='El libro ya existe en la base de datos'
         )
 
     try:
         async with httpx.AsyncClient() as client:
-            description_book = await funciones_busqueda.get(create_book.fuente)(
+            description_book = await funciones_busqueda.get(book_data.fuente)(
                 client, atri_to_search
             )
         await book_collection.insert_one(description_book)
@@ -122,9 +122,7 @@ async def delete_book(id: str) -> JSONResponse:
     """
 
     Args:
-        id:
-
-    Returns:
+        id: Id del libro que se quiere borrar de la bd
 
     """
 
@@ -140,7 +138,7 @@ async def delete_book(id: str) -> JSONResponse:
         )
     else:
         result = JSONResponse(
-            status_code=402, content='Libro no encontrado en la bd'
+            status_code=404, content='Libro no encontrado en la bd'
         )
 
     return result

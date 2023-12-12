@@ -32,8 +32,8 @@ class CrearBook(BaseModel):
 
         """
         tipo_fuentes = ['google', 'open']
-        if fuente in tipo_fuentes:
-            msg = f'Las fuentes validas son{tipo_fuentes}'
+        if fuente not in tipo_fuentes:
+            msg = f'Las fuentes validas son: {tipo_fuentes}'
             raise HTTPException(status_code=422, detail=msg)
 
         return fuente
