@@ -2,19 +2,22 @@ import httpx
 import traceback
 import asyncio
 from config import get_bd
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 
 from config import get_log
-from parser.parser_books import AttributesBooks
+from parser.parser_books import AttributesBooks, CrearBook
+from utils.auth import verificar_token
 from utils.buscar_book_api import buscar_google_api, buscar_open_api
 
 
 books_router = APIRouter(prefix='/books', tags=['books_router'])
 
 
-@books_router.post(path="/get-book", status_code=200)
+@books_router.post(
+    path="/get-book", status_code=200, dependencies=[Depends(verificar_token)]
+)
 async def get_book(atri_book: AttributesBooks) -> JSONResponse:
     """Endpoint que busca un libro en la bd interna o un API externa.
 
@@ -64,8 +67,8 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
     return result
 
 
-@books_router.post(path='/create-book')
-async def create_book(id: str, fuente: str):
+@books_router.post(path='/create-book', dependencies=[Depends(verificar_token)])
+async def create_book(book_data: CrearBook) -> JSONResponse:
     """
 
     Args:
@@ -78,23 +81,26 @@ async def create_book(id: str, fuente: str):
 
     """
 
-    funciones_busqueda = {'google': buscar_google_api}
+    funciones_busqueda = {'google': buscar_google_api, 'open': buscar_open_api}
 
     mongo_bd = get_bd()
     book_collection = mongo_bd['books']
     projection = {'_id': False}
-    atri_to_search = {'id': id}
+    atri_to_search = {'id': book_data.id}
     description_book = await book_collection.find_one(
         atri_to_search, projection=projection
     )
 
     if description_book:
         raise HTTPException(
-            status_code=409, detail='El libro ya se existe en la base de datos'
+            status_code=409, detail='El libro ya existe en la base de datos'
         )
 
     try:
-        description_book = await funciones_busqueda.get(fuente)(atri_to_search)
+        async with httpx.AsyncClient() as client:
+            description_book = await funciones_busqueda.get(book_data.fuente)(
+                client, atri_to_search
+            )
         await book_collection.insert_one(description_book)
         detail = (
             f'El libro {description_book["titulo"]} se guardo correctamente'
@@ -107,14 +113,16 @@ async def create_book(id: str, fuente: str):
         raise HTTPException(status_code=500, detail='No se pudo crear el libro')
 
 
-@books_router.delete(path='/delete-book', status_code=200)
+@books_router.delete(
+    path='/delete-book',
+    status_code=200,
+    dependencies=[Depends(verificar_token)],
+)
 async def delete_book(id: str) -> JSONResponse:
     """
 
     Args:
-        id:
-
-    Returns:
+        id: Id del libro que se quiere borrar de la bd
 
     """
 
@@ -130,7 +138,7 @@ async def delete_book(id: str) -> JSONResponse:
         )
     else:
         result = JSONResponse(
-            status_code=402, content='Libro no encontrado en la bd'
+            status_code=404, content='Libro no encontrado en la bd'
         )
 
     return result
