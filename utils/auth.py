@@ -1,7 +1,8 @@
 import jwt
 
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Header
+from typing import Annotated
 
 
 from config import get_llaves_jwt
@@ -61,3 +62,25 @@ def decode_token(token: str) -> dict:
         data_user = None
 
     return dict(data=data_user, success=success, msg=message)
+
+
+async def verificar_token(token: Annotated[str, Header()]):
+    """Verifica si el token es válido y permite el paso a
+    los endpoint.
+
+    Args:
+        token: Token correspondiente a la información del usuario.
+
+    Returns:
+        retorna la información del usuario si fue validada
+        correctamente.
+
+    """
+
+    data_user = decode_token(token)
+    if data_user['success']:
+        username = data_user['data'].get('username')
+    else:
+        raise data_user['message']
+
+    return username
