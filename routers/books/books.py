@@ -48,11 +48,9 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
 
         if not description_book:
             async with httpx.AsyncClient() as client:
-                print(atri_to_search)
                 google_task = buscar_google_api(client, atri_to_search)
                 open_task = buscar_open_api(client, atri_to_search)
                 description_book = await asyncio.gather(google_task, open_task)
-                print(description_book)
 
                 if not description_book:
                     raise HTTPException(status_code=404,

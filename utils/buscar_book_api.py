@@ -66,10 +66,8 @@ async def buscar_open_api(client: httpx, atributos: dict) -> dict | None:
 
         if atributo:
             atributos_search[atributo] = value
-    print(atributos_search)
+
     response = await client.get(url=OpenLibraryApi.url, params=atributos_search)
-    print(response.status_code)
-    print(response.json())
     if response.status_code == 200 and response.json()['docs']:
         info_book = response.json()["docs"][0]
         info_book['key'] = info_book['key'].split('/')[2]
