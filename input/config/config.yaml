@@ -6,4 +6,4 @@ env: DEV
 
 # Datos de mongo db
 mongo_port: 27017
-host_mongo: localhost
+host_mongo: mongodb
