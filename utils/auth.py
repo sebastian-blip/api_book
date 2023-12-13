@@ -81,6 +81,6 @@ async def verificar_token(token: Annotated[str, Header()]):
     if data_user['success']:
         username = data_user['data'].get('username')
     else:
-        raise data_user['message']
+        raise data_user['msg']
 
     return username
