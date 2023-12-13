@@ -2,6 +2,7 @@ class OpenLibraryApi:
     """Clase con los datos y metadatos para interactuar con el api de open"""
 
     open_atributos = {
+        'id': 'key',
         'titulo': 'title',
         'autor': 'author',
         'catergorias': 'subject',
