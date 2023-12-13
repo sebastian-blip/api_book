@@ -51,6 +51,11 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
                 google_task = buscar_google_api(client, atri_to_search)
                 open_task = buscar_open_api(client, atri_to_search)
                 description_book = await asyncio.gather(google_task, open_task)
+
+                if not description_book:
+                    raise HTTPException(status_code=404,
+                                        detail="Libro no encontrado")
+
                 description_book = max(
                     description_book,
                     key=lambda x: len([v for v in x.values() if v is not None]),
@@ -58,9 +63,6 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
 
         else:
             description_book['fuente'] = 'bd interna'
-
-        if not description_book:
-            raise HTTPException(status_code=404, detail="Libro no encontrado")
 
     result = JSONResponse(status_code=200, content=description_book)
 
