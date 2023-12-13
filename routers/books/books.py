@@ -16,7 +16,7 @@ books_router = APIRouter(prefix='/books', tags=['books_router'])
 
 
 @books_router.post(
-    path="/get-book", status_code=200, dependencies=[Depends(verificar_token)]
+    path="/get-book", status_code=200
 )
 async def get_book(atri_book: AttributesBooks) -> JSONResponse:
     """Endpoint que busca un libro en la bd interna o un API externa.
@@ -48,9 +48,16 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
 
         if not description_book:
             async with httpx.AsyncClient() as client:
+                print(atri_to_search)
                 google_task = buscar_google_api(client, atri_to_search)
                 open_task = buscar_open_api(client, atri_to_search)
                 description_book = await asyncio.gather(google_task, open_task)
+                print(description_book)
+
+                if not description_book:
+                    raise HTTPException(status_code=404,
+                                        detail="Libro no encontrado")
+
                 description_book = max(
                     description_book,
                     key=lambda x: len([v for v in x.values() if v is not None]),
@@ -58,9 +65,6 @@ async def get_book(atri_book: AttributesBooks) -> JSONResponse:
 
         else:
             description_book['fuente'] = 'bd interna'
-
-        if not description_book:
-            raise HTTPException(status_code=404, detail="Libro no encontrado")
 
     result = JSONResponse(status_code=200, content=description_book)
 
