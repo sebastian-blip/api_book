@@ -88,7 +88,7 @@ async def buscar_open_api(client: httpx, atributos: dict) -> dict | None:
         )
         info_book['subtitulo'] = None
         info_book['fuente'] = 'open'
-        if info_book['categorias']:l
+        if info_book['categorias']:
             info_book['descripcion'] = info_book['categorias'][0]
 
         return info_book
