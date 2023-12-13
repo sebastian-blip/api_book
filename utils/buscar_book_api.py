@@ -61,10 +61,15 @@ async def buscar_open_api(client: httpx, atributos: dict) -> dict | None:
     """
     atributos_search = {'sort': 'new'}
 
+    atributo_mapping = {
+        'key': lambda value: f'/works/{value}',
+    }
+
     for key, value in atributos.items():
         atributo = OpenLibraryApi.open_atributos.get(key)
 
         if atributo:
+            value = atributo_mapping.get(atributo, lambda x: x)(value)
             atributos_search[atributo] = value
 
     response = await client.get(url=OpenLibraryApi.url, params=atributos_search)
@@ -83,7 +88,7 @@ async def buscar_open_api(client: httpx, atributos: dict) -> dict | None:
         )
         info_book['subtitulo'] = None
         info_book['fuente'] = 'open'
-        if info_book['categorias']:
+        if info_book['categorias']:l
             info_book['descripcion'] = info_book['categorias'][0]
 
         return info_book
