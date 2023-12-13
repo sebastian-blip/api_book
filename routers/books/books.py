@@ -16,7 +16,7 @@ books_router = APIRouter(prefix='/books', tags=['books_router'])
 
 
 @books_router.post(
-    path="/get-book", status_code=200
+    path="/get-book", status_code=200, dependencies=[Depends(verificar_token)]
 )
 async def get_book(atri_book: AttributesBooks) -> JSONResponse:
     """Endpoint que busca un libro en la bd interna o un API externa.
